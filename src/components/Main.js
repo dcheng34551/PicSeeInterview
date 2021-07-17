@@ -27,9 +27,13 @@ const Main = (props) => {
 			.then((data) => {
 				const currentUrls = myStorage.getItem('all');
 				const parsedArr = JSON.parse(currentUrls);
-				parsedArr.push(data.data.picseeUrl);
+				const preparedData = {
+					origin_url: url,
+					shortened_url: data.data.picseeUrl,
+				};
+				parsedArr.push(preparedData);
 				myStorage.setItem('all', JSON.stringify(parsedArr));
-				setCurrentUrl([...currentUrl, data.data.picseeUrl]);
+				setCurrentUrl([...currentUrl, preparedData]);
 			});
 	};
 
@@ -77,8 +81,9 @@ const Main = (props) => {
 			</form>
 			<ul>
 				{currentUrl.map((url) => (
-					<li key={url}>
-						<a href={url}>{url}</a>
+					<li key={url.shortened_url}>
+						<span>{url.origin_url} &rarr; </span>
+						<a href={url.shortened_url}>{url.shortened_url}</a>
 					</li>
 				))}
 			</ul>
