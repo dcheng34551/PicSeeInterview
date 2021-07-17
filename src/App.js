@@ -7,7 +7,6 @@ function App() {
 			<div className="App">
 				<Switch>
 					<Route path="/" exact render={(props) => <Main {...props} />} />
-					<Route path="/feature" render={(props) => <Main {...props} />} />
 				</Switch>
 			</div>
 		</Router>

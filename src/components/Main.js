@@ -7,7 +7,7 @@ const myStorage = window.localStorage;
 const Main = (props) => {
 	const [url, setUrl] = useState('');
 	const [currentUrl, setCurrentUrl] = useState([]);
-	// const [query, setQuery] = useState('');
+	const [currentUser, setCurrentUser] = useState(null);
 
 	const fetchData = (url) => {
 		fetch(
@@ -25,55 +25,69 @@ const Main = (props) => {
 		)
 			.then((res) => res.json())
 			.then((data) => {
-				const currentUrls = myStorage.getItem('all');
+				let user;
+				user =
+					currentUser === null || currentUser === 'admin' ? 'all' : currentUser;
+				const currentUrls = myStorage.getItem(user);
 				const parsedArr = JSON.parse(currentUrls);
 				const preparedData = {
 					origin_url: url,
 					shortened_url: data.data.picseeUrl,
 				};
 				parsedArr.push(preparedData);
-				myStorage.setItem('all', JSON.stringify(parsedArr));
+				myStorage.setItem(user, JSON.stringify(parsedArr));
 				setCurrentUrl([...currentUrl, preparedData]);
 			});
 	};
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		fetchData(url);
+		fetchData(url, currentUser);
 		setUrl('');
 	};
 
+	// reset localStorage
 	// useEffect(() => {
-	// 	setQuery(props.location.search);
-	// 	console.log(window.localStorage.getItem('all'));
+	// 	if (myStorage.getItem('all') === null) {
+	// 		myStorage.setItem('all', JSON.stringify([]));
+	// 	} else {
+	// 		if (currentUser === null) {
+	// 			let currentUrls = JSON.parse(myStorage.getItem('all'));
+	// 			setCurrentUrl(currentUrls);
+	// 		}
+	// 	}
 	// }, []);
 
-	// reset localStorage
+	// make sure localStorage base is there
 	useEffect(() => {
 		if (myStorage.getItem('all') === null) {
 			myStorage.setItem('all', JSON.stringify([]));
-		} else {
-			let currentUrls = JSON.parse(myStorage.getItem('all'));
-			setCurrentUrl(currentUrls);
 		}
+		const query = new URLSearchParams(props.location.search);
+		const user = query.get('feature');
+		setCurrentUser(user);
 	}, []);
 
-	// useEffect(() => {
-	// 	if (window.localStorage.getItem('all') === null) {
-	// 		window.localStorage.setItem('all', currentUrl);
-	// 	} else {
-	// 		window.localStorage.setItem('all', currentUrl);
-	// 	}
-	// }, [currentUrl]);
-
-	// useEffect(() => {
-	//   if(query === '?admin') {
-
-	//   }
-	// }, [query])
+	useEffect(() => {
+		if (currentUser === 'admin' || currentUser === null) {
+			let currentUrls = JSON.parse(myStorage.getItem('all'));
+			setCurrentUrl(currentUrls);
+		} else {
+			if (myStorage.getItem(currentUser) === null) {
+				myStorage.setItem(currentUser, JSON.stringify([]));
+			} else {
+				let currentUrls = JSON.parse(myStorage.getItem(currentUser));
+				setCurrentUrl(currentUrls);
+			}
+		}
+	}, [currentUser]);
 
 	return (
 		<>
+			<form>
+				<input name="feature" />
+				<button type="submit">使用者登入</button>
+			</form>
 			<form onSubmit={handleSubmit}>
 				<label htmlFor="url">請輸入網址:</label>
 				<input value={url} onChange={(e) => setUrl(e.target.value)} id="url" />
