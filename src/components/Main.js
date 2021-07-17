@@ -46,18 +46,6 @@ const Main = (props) => {
 		setUrl('');
 	};
 
-	// reset localStorage
-	// useEffect(() => {
-	// 	if (myStorage.getItem('all') === null) {
-	// 		myStorage.setItem('all', JSON.stringify([]));
-	// 	} else {
-	// 		if (currentUser === null) {
-	// 			let currentUrls = JSON.parse(myStorage.getItem('all'));
-	// 			setCurrentUrl(currentUrls);
-	// 		}
-	// 	}
-	// }, []);
-
 	// make sure localStorage base is there
 	useEffect(() => {
 		if (myStorage.getItem('all') === null) {
