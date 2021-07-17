@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { withRouter } from 'react-router';
-import queryString from 'query-string';
+// import queryString from 'query-string';
 
-// try to finish the topic
+const myStorage = window.localStorage;
 
 const Main = (props) => {
 	const [url, setUrl] = useState('');
 	const [currentUrl, setCurrentUrl] = useState([]);
-	const [query, setQuery] = useState('');
+	// const [query, setQuery] = useState('');
 
 	const fetchData = (url) => {
 		fetch(
@@ -25,6 +25,10 @@ const Main = (props) => {
 		)
 			.then((res) => res.json())
 			.then((data) => {
+				const currentUrls = myStorage.getItem('all');
+				const parsedArr = JSON.parse(currentUrls);
+				parsedArr.push(data.data.picseeUrl);
+				myStorage.setItem('all', JSON.stringify(parsedArr));
 				setCurrentUrl([...currentUrl, data.data.picseeUrl]);
 			});
 	};
@@ -40,11 +44,13 @@ const Main = (props) => {
 	// 	console.log(window.localStorage.getItem('all'));
 	// }, []);
 
+	// reset localStorage
 	useEffect(() => {
-		if (window.localStorage.getItem('all') === null) {
-			window.localStorage.setItem('all', JSON.stringify([]));
-			let data = window.localStorage.getItem('all');
-			setCurrentUrl(JSON.parse(data));
+		if (myStorage.getItem('all') === null) {
+			myStorage.setItem('all', JSON.stringify([]));
+		} else {
+			let currentUrls = JSON.parse(myStorage.getItem('all'));
+			setCurrentUrl(currentUrls);
 		}
 	}, []);
 
