@@ -25,8 +25,7 @@ const Main = (props) => {
 		)
 			.then((res) => res.json())
 			.then((data) => {
-				let user;
-				user =
+				let user =
 					currentUser === null || currentUser === 'admin' ? 'all' : currentUser;
 				const currentUrls = myStorage.getItem(user);
 				const parsedArr = JSON.parse(currentUrls);
@@ -34,15 +33,31 @@ const Main = (props) => {
 					origin_url: url,
 					shortened_url: data.data.picseeUrl,
 				};
-				parsedArr.push(preparedData);
-				myStorage.setItem(user, JSON.stringify(parsedArr));
-				setCurrentUrl([...currentUrl, preparedData]);
+				if (user !== 'all') {
+					if (parsedArr.length < 3) {
+						parsedArr.push(preparedData);
+						myStorage.setItem(user, JSON.stringify(parsedArr));
+						setCurrentUrl([...currentUrl, preparedData]);
+						const allData = myStorage.getItem('all');
+						const parsedAll = JSON.parse(allData);
+						myStorage.setItem(
+							'all',
+							JSON.stringify([...parsedAll, preparedData])
+						);
+					} else {
+						window.alert('No more shortened URL');
+					}
+				} else {
+					parsedArr.push(preparedData);
+					myStorage.setItem(user, JSON.stringify(parsedArr));
+					setCurrentUrl([...currentUrl, preparedData]);
+				}
 			});
 	};
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		fetchData(url, currentUser);
+		fetchData(url);
 		setUrl('');
 	};
 
@@ -63,6 +78,7 @@ const Main = (props) => {
 		} else {
 			if (myStorage.getItem(currentUser) === null) {
 				myStorage.setItem(currentUser, JSON.stringify([]));
+				setCurrentUrl([]);
 			} else {
 				let currentUrls = JSON.parse(myStorage.getItem(currentUser));
 				setCurrentUrl(currentUrls);
